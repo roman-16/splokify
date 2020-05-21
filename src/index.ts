@@ -1,20 +1,22 @@
-import path from 'path';
-import { app, BrowserWindow, globalShortcut } from 'electron';
+import { app, BrowserWindow, globalShortcut, session } from 'electron';
 import createExecuter from './createExecuter';
+import blockAds from './blockAds';
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-function createWindow() {
-  BrowserWindow.addExtension(path.resolve(__dirname, '../uBlock'));
+const createWindow = async () => {
+  await blockAds(session.defaultSession);
 
-  const window = new BrowserWindow({ webPreferences: { plugins: true } });
+  const window = new BrowserWindow();
 
-  if (isDevelopment) {
+  window.loadURL('https://open.spotify.com/');
+
+  if (!isDevelopment) {
+    window.removeMenu();
+  } else {
     window.webContents.openDevTools();
     window.maximize();
   }
-
-  window.loadURL('https://open.spotify.com');
 
   const executer = createExecuter(window);
 
@@ -22,7 +24,19 @@ function createWindow() {
   globalShortcut.register('MediaPlayPause', () => executer.togglePlay());
   globalShortcut.register('MediaStop', () => executer.stopTrack());
   globalShortcut.register('MediaNextTrack', () => executer.nextTrack());
-}
+};
 
 app.userAgentFallback = 'Chrome/81';
 app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
