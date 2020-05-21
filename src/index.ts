@@ -1,4 +1,5 @@
 import { app, BrowserWindow, globalShortcut, session } from 'electron';
+import windowStateKeeper from 'electron-window-state';
 import createExecuter from './createExecuter';
 import blockAds from './blockAds';
 
@@ -7,8 +8,15 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 const createWindow = async () => {
   await blockAds(session.defaultSession);
 
-  const window = new BrowserWindow();
+  const windowState = windowStateKeeper({ defaultWidth: 800, defaultHeight: 600 });
+  const window = new BrowserWindow({
+    x: windowState.x,
+    y: windowState.y,
+    width: windowState.width,
+    height: windowState.height,
+  });
 
+  windowState.manage(window);
   window.loadURL('https://open.spotify.com/');
 
   if (!isDevelopment) {
@@ -27,6 +35,7 @@ const createWindow = async () => {
 };
 
 app.userAgentFallback = 'Chrome/81';
+
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {

@@ -3,16 +3,20 @@
   "private": true,
   "license": "MIT",
   "version": "1.0.0",
+  "main": "dist/index.js",
   "scripts": {
+    "build:production": "webpack --mode production",
     "build:development": "webpack --mode development",
     "build:development:watch": "yarn run build:development --watch",
+    "dist": "yarn run build:production && electron-builder -mwl",
     "start": "run-p build:development:watch start:dev:watch",
     "start:dev": "electron dist/index.js",
     "start:dev:watch": "nodemon --watch \"dist/*\" --exec \"yarn run start:dev\""
   },
   "dependencies": {
     "@cliqz/adblocker-electron": "^1.14.4",
-    "cross-fetch": "^3.0.4"
+    "cross-fetch": "^3.0.4",
+    "electron-window-state": "^5.0.3"
   },
   "devDependencies": {
     "@blue-tomato/eslint-config": "^2.0.2",
@@ -36,7 +40,17 @@
     "appId": "splokify",
     "productName": "Splokify",
     "directories": {
+      "buildResources": "static",
       "output": "app"
+    },
+    "linux": {
+      "category": "Audio"
+    },
+    "win": {
+      "target": "portable"
+    },
+    "electronDownload": {
+      "mirror": "https://github.com/castlabs/electron-releases/releases/download/v"
     }
   }
 }
