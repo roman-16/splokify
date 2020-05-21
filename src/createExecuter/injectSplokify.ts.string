@@ -1,0 +1,35 @@
+interface Window {
+  splokify: unknown;
+}
+
+const main = () => {
+  const [
+    shuffleButton,
+    previousTrackButton,
+    playButton,
+    nextTrackButton,
+    repeatButton,
+  ]: NodeListOf<HTMLButtonElement> = document.querySelectorAll('.Root__top-container .player-controls__buttons button');
+
+  const splokify = {
+    media: {
+      buttons: {
+        shuffle: shuffleButton,
+        previousTrack: previousTrackButton,
+        play: playButton,
+        nextTrack: nextTrackButton,
+        repeat: repeatButton,
+      },
+      actions: {
+        previousTrack: () => previousTrackButton.click(),
+        togglePlay: () => playButton.click(),
+        stopTrack: () => playButton.getAttribute('data-testid') === 'control-button-pause' && playButton.click(),
+        nextTrack: () => nextTrackButton.click(),
+      },
+    },
+  };
+
+  window.splokify = splokify;
+};
+
+main();
